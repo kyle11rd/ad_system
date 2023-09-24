@@ -3,34 +3,21 @@ package main
 import "fmt"
 
 func main() {
-	bids := dsp()
-	slots := ssp()
-	deals := aex(bids, slots)
+	//input = # of daily campaigns
+	var campaigns int = 1000
+	max_bids, daily_budgets, ctrs := dsp(campaigns)
 
-	fmt.Println(deals)
+	//daily_slots = how many impressions can be displayed per day
+	//campaigns_per_selection = how many compaigns the simulator will randomly grab to choose a bid winner
+	daily_slots, campaigns_per_selection := ssp(2000, 10)
 
-}
+	totalImp, totalClick, totalCost := aex(campaigns, max_bids, daily_budgets, ctrs, daily_slots, campaigns_per_selection)
 
-//Demand Side Platform
-func dsp() (bids []float32) {
-	bids = make([]float32, 2) //$ advertisers would like to pay for an impression or click
-	bids[0] = 1
-	bids[1] = 2
-	return
-}
+	fmt.Printf("Total Impressions: %d\n", totalImp)
+	fmt.Printf("Total Clicks: %d\n", totalClick)
+	fmt.Printf("Total Cost: %.2f\n", totalCost)
+	fmt.Printf("Ad CTRs: %.2f%%\n", float32(totalClick)/float32(totalImp)*100)
+	fmt.Printf("CPM: $%.4f\n", totalCost/float32(totalImp)*1000)
+	fmt.Printf("CPC: $%.4f\n", totalCost/float32(totalClick))
 
-//Supply Side Platform
-func ssp() (slots []bool) {
-	slots = append(slots, true) //if has a slot for ad
-	return
-}
-
-//Ad Exchange
-func aex(bids []float32, slots []bool) (deals []float32) {
-	if bids[0] >= bids[1] {
-		deals = append(deals, bids[0]) //confirmed cost for advertiser
-	} else {
-		deals = append(deals, bids[1])
-	}
-	return
 }
